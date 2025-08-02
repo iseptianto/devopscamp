@@ -1,10 +1,6 @@
-services:
-  healthcheck:
-    test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-    interval: 30s
-    timeout: 10s
-    retries: 3
+version: "3.9"
 
+services:
   nginx_load_balancer:
     image: nginx:alpine
     container_name: nginx_load_balancer
@@ -15,6 +11,7 @@ services:
     depends_on:
       fastapi_app:
         condition: service_healthy
+
   db:
     image: postgres:13
     container_name: mlflow_db
@@ -81,14 +78,6 @@ services:
       retries: 3
     depends_on:
       - mlflow_server
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '1'
-    #       memory: 50M
-    #     reservations:
-    #       cpus: '1'
-    #       memory: 20M
 
   model_trainer:
     container_name: model_trainer
@@ -133,18 +122,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - prometheus_server
-
-  # ---- HORIZONTAL SCALLING ----
-  # fastapi_app:
-  #   build: ./app
-  #   environment:
-  #     - MLFLOW_TRACKING_URI=http://mlflow_server:5001
-  #     - AWS_ACCESS_KEY_ID=minioadmin
-  #     - AWS_SECRET_ACCESS_KEY=minioadmin
-  #     - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
-  #   depends_on:
-  #     - mlflow_server
- 
 
 volumes:
   mlflow_db_data:

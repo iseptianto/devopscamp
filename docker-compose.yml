@@ -85,6 +85,8 @@ services:
       context: ./model
       dockerfile: Dockerfile
     command: ["python", "train_model.py"]
+    volumes:
+      - ./model:/app/model
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow_server:5001
       - AWS_ACCESS_KEY_ID=minioadmin
@@ -93,6 +95,7 @@ services:
     depends_on:
       - db
       - minio
+
 
   prometheus_server:
     image: prom/prometheus:v2.45.0

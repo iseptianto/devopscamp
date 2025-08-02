@@ -1,0 +1,76 @@
+# --- Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Nama unik untuk Deployment Anda
+  name: tourism-api-deployment
+  labels:
+    app: tourism-api
+spec:
+  # Best Practice: Menjalankan lebih dari 1 replika untuk high availability
+  replicas: 3
+  # Selector untuk menghubungkan Deployment ini dengan Pods yang sesuai
+  selector:
+    matchLabels:
+      app: tourism-api
+  # Template untuk membuat Pods
+  template:
+    metadata:
+      # Label yang sama dengan selector di atas
+      labels:
+        app: tourism-api
+    spec:
+      containers:
+      - name: tourism-api-container
+        # PENTING: Ganti dengan path image Docker Anda di registry (misal: gcr.io/nama-projek/tourism-api:v1)
+        image: docker-registry/tourism-api:latest
+        # Best Practice: imagePullPolicy 'Always' memastikan image terbaru yang digunakan saat Pod dibuat ulang.
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000 # Port yang diekspos oleh aplikasi Flask di dalam container
+
+        # --- Best Practice: Health Checks (Probes) ---
+        # Liveness Probe: Jika gagal, Kubernetes akan me-restart container.
+        livenessProbe:
+          httpGet:
+            path: /health # Menggunakan endpoint health check yang sudah dibuat
+            port: 5000
+          initialDelaySeconds: 15 # Tunggu 15 detik setelah container start sebelum probe pertama
+          periodSeconds: 20     # Cek setiap 20 detik
+
+        # Readiness Probe: Jika gagal, Kubernetes tidak akan mengirim traffic ke Pod ini.
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+        # --- Best Practice: Resource Requests & Limits ---
+        # Menjamin alokasi resource dan mencegah satu Pod menghabiskan resource node.
+        # Sesuaikan nilainya berdasarkan kebutuhan aplikasi Anda.
+        resources:
+          requests: # Resource minimal yang dibutuhkan
+            cpu: "100m"     # 0.1 core CPU
+            memory: "256Mi" # 256 Mebibytes
+          limits:   # Resource maksimal yang bisa digunakan
+            cpu: "500m"     # 0.5 core CPU
+            memory: "512Mi" # 512 Mebibytes
+---
+# --- Service ---
+# Mendefinisikan cara mengakses aplikasi (Pods) dari luar atau dalam klaster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: tourism-api-service
+spec:
+  # Best Practice: 'LoadBalancer' akan membuat IP eksternal di cloud provider.
+  # Gunakan 'NodePort' atau 'ClusterIP' untuk lingkungan lain jika perlu.
+  type: ClusterIP
+  # Selector untuk menargetkan Pods dengan label 'app: tourism-api'
+  selector:
+    app: tourism-api
+  ports:
+  - protocol: TCP
+    port: 80         # Port yang akan diekspos ke luar (misal: port HTTP)
+    targetPort: 5000 # Port pada container yang akan dituju oleh traffic

@@ -43,23 +43,24 @@ services:
       retries: 3
 
   mlflow_server:
-    build: ./mlflow_server
-    container_name: mlflow_server
-    command: >
-      mlflow server
-      --backend-store-uri postgresql://mlflow:mlflow@db:5432/mlflow
-      --default-artifact-root s3://mlflow/
-      --host 0.0.0.0
-      --port 5001
-    ports:
-      - "5001:5001"
-    environment:
-      - AWS_ACCESS_KEY_ID=minioadmin
-      - AWS_SECRET_ACCESS_KEY=minioadmin
-      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
-    depends_on:
-      - db
-      - minio
+  build: ./mlflow_server
+  container_name: mlflow_server
+  command: >
+    mlflow server
+    --backend-store-uri postgresql://mlflow:mlflow@mlflow_db:5432/mlflow
+    --default-artifact-root s3://mlflow/
+    --host 0.0.0.0
+    --port 5001
+  ports:
+    - "5001:5001"
+  environment:
+    - AWS_ACCESS_KEY_ID=minioadmin
+    - AWS_SECRET_ACCESS_KEY=minioadmin
+    - MLFLOW_S3_ENDPOINT_URL=http://mlflow_minio:9000
+  depends_on:
+    - mlflow_db
+    - mlflow_minio
+
 
   fastapi_app:
     build: ./app

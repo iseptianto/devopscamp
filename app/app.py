@@ -95,7 +95,12 @@ def load_model():
         logging.error(f"A general error occurred while loading the model. Error: {e}", exc_info=True)
 
 # --- Main Endpoint ---
-@app.get("/")
+@app.get("/predict")
+def predict(user_id: int):
+    user_idx = user_encoder.transform([user_id])
+    recs = prediction_matrix[user_idx].toarray().flatten()
+    return {"recommendations": recs.argsort()[-5:][::-1].tolist()}
+
 def read_root():
     """
     Root endpoint that provides status information about the API and the loaded model.

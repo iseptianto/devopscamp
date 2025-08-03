@@ -58,8 +58,9 @@ services:
       - AWS_SECRET_ACCESS_KEY=minioadmin
       - MLFLOW_S3_ENDPOINT_URL=http://mlflow_minio:9000
     depends_on:
-      - mlflow_db
-      - mlflow_minio
+      - db
+      - minio
+
 
 
 

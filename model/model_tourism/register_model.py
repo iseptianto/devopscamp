@@ -2,19 +2,11 @@ import mlflow
 import joblib
 import os
 
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow_server:5001")
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow_server:5001"))
 mlflow.set_experiment("tourism-indonesia")
 
 with mlflow.start_run():
-    model = joblib.load("model_tourism.pkl")  # ganti sesuai nama file kamu
+    for file in ["prediction_matrix.pkl", "user_encoder.pkl", "place_encoder.pkl", "content_similarity.pkl"]:
+        mlflow.log_artifact(file)
 
-    # log model ke mlflow
-    mlflow.sklearn.log_model(
-        sk_model=model,
-        artifact_path="model",
-        registered_model_name="tourism-classifier"
-    )
-
-    # log metric dummy aja biar gak kosong
     mlflow.log_metric("dummy_accuracy", 0.9)

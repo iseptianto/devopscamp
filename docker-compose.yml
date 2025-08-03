@@ -168,12 +168,13 @@ services:
       - prometheus_server
     networks:
       - mlflow_net
-  networks:
-    mlflow_net:
-      driver: bridge
 
 volumes:
   mlflow_db_data:
   mlflow_minio_data:
   prometheus_data:
   grafana_data:
+
+networks:
+  mlflow_net:
+    driver: bridge

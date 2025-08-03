@@ -8,7 +8,7 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
     ports:
-      - "9090:9090"
+      - "9000:9000"
 
   nginx_load_balancer:
     image: nginx:alpine

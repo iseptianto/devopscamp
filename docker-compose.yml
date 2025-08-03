@@ -83,7 +83,7 @@ services:
       - mlflow_server
 
   fastapi_tourism_app:
-    build: ./tourism-api/app
+    build: ./tourism-api/app/app
     container_name: fastapi_tourism_app
     ports:
       - "8100:8000"

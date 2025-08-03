@@ -1,6 +1,11 @@
 version: "3.9"
 
 services:
+  mlflow_minio:
+    container_name: mlflow_minio
+    image: minio/minio
+    ...
+
   nginx_load_balancer:
     image: nginx:alpine
     container_name: nginx_load_balancer
@@ -124,21 +129,11 @@ services:
     command: ["python", "register_model.py"]
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow_server:5001
+      - MLFLOW_S3_ENDPOINT_URL=http://mlflow_minio:9000
       - AWS_ACCESS_KEY_ID=minioadmin
       - AWS_SECRET_ACCESS_KEY=minioadmin
-      - MLFLOW_S3_ENDPOINT_URL=http://mlflow_minio:9000
     depends_on:
       - mlflow_server
-
-  model_tourism_trainer:
-    build:
-      context: ./model/model_tourism
-    environment:
-      - MLFLOW_TRACKING_URI=http://mlflow_server:5001
-      - MLFLOW_S3_ENDPOINT_URL=http://mlflow_minio:9000
-      - AWS_ACCESS_KEY_ID=minioadmin
-      - AWS_SECRET_ACCESS_KEY=minioadmin
-    ...
 
   prometheus_server:
     image: prom/prometheus:v2.45.0

@@ -2,9 +2,13 @@ version: "3.9"
 
 services:
   mlflow_minio:
-    container_name: mlflow_minio
     image: minio/minio
-    ...
+    command: server /data
+    environment:
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    ports:
+      - "9090:9090"
 
   nginx_load_balancer:
     image: nginx:alpine

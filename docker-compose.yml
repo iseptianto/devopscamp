@@ -81,7 +81,21 @@ services:
       retries: 3
     depends_on:
       - mlflow_server
- 
+
+  fastapi_tourism_app:
+    build: ./tourism-api/app
+    container_name: fastapi_tourism_app
+    ports:
+      - "8100:8000"
+    volumes:
+      - ./model/model_tourism:/app/models
+    environment:
+      - SOME_ENV_VAR=xxx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   model_trainer:
     container_name: model_trainer

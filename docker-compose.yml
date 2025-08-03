@@ -130,6 +130,15 @@ services:
     depends_on:
       - mlflow_server
 
+  model_tourism_trainer:
+    build:
+      context: ./model/model_tourism
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow_server:5001
+      - MLFLOW_S3_ENDPOINT_URL=http://mlflow_minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
+    ...
 
   prometheus_server:
     image: prom/prometheus:v2.45.0
